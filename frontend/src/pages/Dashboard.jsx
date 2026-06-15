@@ -180,7 +180,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard-layout">
 
-      {/* ── Sidebar ── */}
+      {/*Sidebar*/}
       <aside className="sidebar">
         <div className="sidebar-logo">
           <div className="logo-mark">▶</div>
@@ -200,7 +200,7 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* ── Main Content ── */}
+    
       <main className="main-content">
 
         <div className="page-header">
@@ -268,7 +268,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ── Projects Grid ── */}
+        {/*Projects Grid*/}
         <h2 className="section-title">
           Recent Projects {!loading && `(${projects.length})`}
         </h2>
@@ -309,7 +309,7 @@ export default function Dashboard() {
   );
 }
 
-// ── Project Card ──
+//Project Card
 function ProjectCard({ project, onGenerate, generatingId, StatusBadge, navigate, onDownload }) {
   const isGenerating = generatingId === project._id;
   const isCompleted  = project.status === "completed";
@@ -366,7 +366,7 @@ ${text}
         <p className="processing-text">Processing...</p>
       )}
       {isCompleted && (
-        <div className="project-actions">
+        <div className="card-actions">
           <button
             className="btn-secondary"
             onClick={() =>
