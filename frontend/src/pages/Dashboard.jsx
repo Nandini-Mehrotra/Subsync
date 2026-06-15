@@ -188,8 +188,6 @@ export default function Dashboard() {
         </div>
         <nav className="sidebar-nav">
           <a href="#" className="active">🗂 Projects</a>
-          <a href="#">📊 Analytics</a>
-          <a href="#">⚙ Settings</a>
         </nav>
         <div className="sidebar-bottom">
           <div className="user-row">
