@@ -329,11 +329,32 @@ function ProjectCard({ project, onGenerate, generatingId, StatusBadge, navigate,
   URL.revokeObjectURL(url);
 }
 
-function makeSRT(text) {
-  return `1
+function formatTime(seconds) {
+  const date = new Date(seconds * 1000);
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const secs = String(date.getUTCSeconds()).padStart(2, "0");
+  const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
+
+  return `${hours}:${minutes}:${secs},${ms}`;
+}
+
+function makeSRT(project) {
+  if (!project.segments || project.segments.length === 0) {
+    return `1
 00:00:00,000 --> 00:00:10,000
-${text}
+${project.transcriptText || ""}
 `;
+  }
+
+  return project.segments
+    .map((seg, index) => {
+      return `${index + 1}
+${formatTime(seg.start)} --> ${formatTime(seg.end)}
+${seg.text}
+`;
+    })
+    .join("\n");
 }
   return (
     <div className="project-card">
@@ -395,7 +416,7 @@ ${text}
           <button
             className="btn-secondary"
             onClick={() =>
-              downloadTextFile("subtitle.srt", makeSRT(project.transcriptText || ""))
+              downloadTextFile("subtitle.srt", makeSRT(project))
             }
           >
             SRT
