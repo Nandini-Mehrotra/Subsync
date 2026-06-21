@@ -14,6 +14,7 @@ const generateTranscript = async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
+    // Set status
     subtitle.status = "processing";
     await subtitle.save();
 
@@ -21,27 +22,47 @@ const generateTranscript = async (req, res) => {
     const filePath = path.join(__dirname, "..", subtitle.filePath);
 
     execFile("python", [scriptPath, filePath], async (error, stdout, stderr) => {
-      if (error) {
-        console.log("Python error:", error);
-        console.log("stderr:", stderr);
+      try {
+        if (error) {
+          console.log("Python error:", error);
+          console.log("stderr:", stderr);
+
+          subtitle.status = "failed";
+          await subtitle.save();
+
+          return res.status(500).json({
+            message: "Transcript generation failed",
+            error: stderr || error.message,
+          });
+        }
+
+        // Parse segments
+        const segments = JSON.parse(stdout);
+
+        // Join text
+        const fullText = segments.map((seg) => seg.text).join(" ");
+
+        subtitle.transcriptText = fullText;
+        subtitle.segments = segments;
+        subtitle.status = "completed";
+
+        await subtitle.save();
+
+        res.json({
+          message: "Transcript generated successfully",
+          subtitle,
+        });
+      } catch (parseError) {
+        console.log("Parse error:", parseError.message);
 
         subtitle.status = "failed";
         await subtitle.save();
 
-        return res.status(500).json({
-          message: "Transcript generation failed",
-          error: stderr || error.message,
+        res.status(500).json({
+          message: "Failed to parse transcript output",
+          error: parseError.message,
         });
       }
-
-      subtitle.transcriptText = stdout.trim();
-      subtitle.status = "completed";
-      await subtitle.save();
-
-      res.json({
-        message: "Transcript generated successfully",
-        subtitle,
-      });
     });
   } catch (error) {
     res.status(500).json({

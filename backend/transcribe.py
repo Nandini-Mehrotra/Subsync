@@ -1,18 +1,20 @@
 from faster_whisper import WhisperModel
 import sys
+import json
 
 audio_file = sys.argv[1]
 
-# Load model
 model = WhisperModel("base")
 
-# Transcribe audio
 segments, info = model.transcribe(audio_file)
 
-full_text = ""
+result = []
 
-# Join text
 for segment in segments:
-    full_text += segment.text + " "
+    result.append({
+        "start": segment.start,
+        "end": segment.end,
+        "text": segment.text.strip()
+    })
 
-print(full_text)
+print(json.dumps(result, ensure_ascii=False))

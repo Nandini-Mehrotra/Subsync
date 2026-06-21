@@ -25,6 +25,18 @@ const subtitleSchema = new mongoose.Schema(
       default: "",
     },
 
+      segments: [
+    {
+      start: Number,
+      end: Number,
+      text: String,
+      hinglishText: {
+        type: String,
+        default: "",
+      },
+    },
+  ],
+
     status: {
       type: String,
       enum: ["uploaded", "processing", "completed", "failed"],
