@@ -44,20 +44,43 @@ function Editor() {
       </button>
 
       <div className="editor-card">
-        <h1>Subtitle Editor</h1>
-        <p className="editor-file">{project.originalFileName}</p>
-        <span className="status-badge status-completed">{project.status}</span>
+      <h1>Subtitle Editor</h1>
 
-        <textarea
-          className="editor-textarea"
-          value={transcriptText}
-          onChange={(e) => setTranscriptText(e.target.value)}
-          placeholder="Edit transcript here..."
-        />
+      <p className="editor-file">{project.originalFileName}</p>
 
-        <button className="btn-primary" onClick={handleSave}>
-          Save Transcript
-        </button>
+      <span className="status-badge status-completed">
+        {project.status}
+      </span>
+
+      {/* Video / Audio Preview */}
+      {project.filePath && (
+        <div className="preview-box">
+          {project.originalFileName?.match(/\.(mp4|mov|webm)$/i) ? (
+            <video
+              className="media-preview"
+              src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
+              controls
+            />
+          ) : (
+            <audio
+              className="media-preview"
+              src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
+              controls
+            />
+          )}
+        </div>
+      )}
+
+      <textarea
+        className="editor-textarea"
+        value={transcriptText}
+        onChange={(e) => setTranscriptText(e.target.value)}
+        placeholder="Edit transcript here..."
+      />
+
+      <button className="btn-primary" onClick={handleSave}>
+        Save Transcript
+      </button>
 
         {message && <p className="success-msg">{message}</p>}
       </div>

@@ -11,13 +11,6 @@ const app = express();
 connectDB();
 
 
-// app.use(
-//   cors({
-//     origin: ["http://localhost:5173"],
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//     allowedHeaders: ["Content-Type", "Authorization"],
-//   })
-// );
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -35,6 +28,11 @@ app.use(express.json());
 
 
 app.use("/api/auth", authRoutes);
+
+const path = require("path");
+
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
   res.send("SubSync Backend Running");
