@@ -33,12 +33,34 @@ for segment in segments:
     except Exception:
         hinglish_text = original_text
 
-    result_segments.append({
-        "start": segment.start,
-        "end": segment.end,
-        "text": original_text,
-        "hinglishText": hinglish_text
-    })
+    words = hinglish_text.split()
+
+    MAX_WORDS = 7
+
+    if len(words) <= MAX_WORDS:
+        result_segments.append({
+            "start": segment.start,
+            "end": segment.end,
+            "text": original_text,
+            "hinglishText": hinglish_text
+        })
+    else:
+        total_duration = segment.end - segment.start
+
+        chunks = [
+            words[i:i + MAX_WORDS]
+            for i in range(0, len(words), MAX_WORDS)
+        ]
+
+        chunk_duration = total_duration / len(chunks)
+
+        for idx, chunk in enumerate(chunks):
+            result_segments.append({
+                "start": segment.start + idx * chunk_duration,
+                "end": segment.start + (idx + 1) * chunk_duration,
+                "text": " ".join(chunk),
+                "hinglishText": " ".join(chunk)
+            })
 
     full_text += original_text + " "
     full_hinglish += hinglish_text + " "

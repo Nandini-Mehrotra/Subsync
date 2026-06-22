@@ -715,3 +715,24 @@ body {
   border: 1px solid #333;
   border-radius: 12px;
 }
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.subtitle-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 54px;
+  transform: translateX(-50%);
+  max-width: 85%;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 20px;
+  line-height: 1.4;
+}

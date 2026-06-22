@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../services/api";
 
@@ -9,6 +9,8 @@ function Editor() {
   const [project, setProject] = useState(null);
   const [transcriptText, setTranscriptText] = useState("");
   const [message, setMessage] = useState("");
+  const [currentSubtitle, setCurrentSubtitle] = useState("");
+  const mediaRef = useRef(null);
 
   const fetchProject = async () => {
     try {
@@ -35,6 +37,17 @@ function Editor() {
     }
   };
 
+    function handleTimeUpdate() {
+      const time = mediaRef.current.currentTime;
+
+      const activeSegment = project.segments?.find(
+        (seg) => time >= seg.start && time <= seg.end
+      );
+
+      setCurrentSubtitle(
+        activeSegment?.hinglishText || activeSegment?.text || ""
+      );
+    }
   if (!project) return <p>Loading project...</p>;
 
   return (
@@ -56,16 +69,28 @@ function Editor() {
       {project.filePath && (
         <div className="preview-box">
           {project.originalFileName?.match(/\.(mp4|mov|webm)$/i) ? (
-            <video
-              className="media-preview"
-              src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
-              controls
-            />
+            <div className="video-wrapper">
+              <video
+                ref={mediaRef}
+                className="media-preview"
+                src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
+                controls
+                onTimeUpdate={handleTimeUpdate}
+              />
+
+              {currentSubtitle && (
+                <div className="subtitle-overlay">
+                  {currentSubtitle}
+                </div>
+              )}
+            </div>
           ) : (
             <audio
+              ref={mediaRef}
               className="media-preview"
               src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
               controls
+              onTimeUpdate={handleTimeUpdate}
             />
           )}
         </div>
