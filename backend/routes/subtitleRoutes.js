@@ -96,7 +96,15 @@ router.put("/:id", protect, async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    subtitle.transcriptText = req.body.transcriptText;
+    // Update Hindi transcript if sent
+    if (req.body.transcriptText !== undefined) {
+      subtitle.transcriptText = req.body.transcriptText;
+    }
+
+    // Update Hinglish transcript if sent
+    if (req.body.hinglishText !== undefined) {
+      subtitle.hinglishText = req.body.hinglishText;
+    }
 
     await subtitle.save();
 
@@ -105,6 +113,8 @@ router.put("/:id", protect, async (req, res) => {
       subtitle,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message: "Failed to save transcript",
     });

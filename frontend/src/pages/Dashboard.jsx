@@ -357,7 +357,7 @@ function makeSRT(project) {
   if (!project.segments || project.segments.length === 0) {
     return `1
 00:00:00,000 --> 00:00:10,000
-${project.transcriptText || ""}
+${project.hinglishText || project.transcriptText || ""}
 `;
   }
 
@@ -405,7 +405,7 @@ ${seg.hinglishText || seg.text}
           <button
             className="btn-secondary"
             onClick={() =>
-              navigator.clipboard.writeText(project.transcriptText || "")
+              navigator.clipboard.writeText(project.hinglishText || project.transcriptText || "")
             }
           >
             Copy Transcript

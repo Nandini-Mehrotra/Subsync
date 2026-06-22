@@ -14,7 +14,7 @@ function Editor() {
     try {
       const res = await API.get(`/subtitles/${id}`);
       setProject(res.data);
-      setTranscriptText(res.data.transcriptText || "");
+      setTranscriptText(res.data.hinglishText || res.data.transcriptText || "");
     } catch (error) {
       setMessage("Failed to load project");
     }
@@ -26,7 +26,9 @@ function Editor() {
 
   const handleSave = async () => {
     try {
-      const res = await API.put(`/subtitles/${id}`, { transcriptText });
+      const res = await API.put(`/subtitles/${id}`, {
+        hinglishText: transcriptText,
+      });
       setMessage(res.data.message);
     } catch (error) {
       setMessage("Failed to save transcript");
