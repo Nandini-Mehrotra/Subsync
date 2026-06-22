@@ -25,6 +25,11 @@ const subtitleSchema = new mongoose.Schema(
       default: "",
     },
 
+    hinglishText: {
+      type: String,
+      default: "",
+    },
+
       segments: [
     {
       start: Number,

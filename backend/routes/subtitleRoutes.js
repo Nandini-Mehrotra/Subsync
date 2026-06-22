@@ -168,4 +168,25 @@ ${text}
     res.status(500).json({ message: "SRT download failed" });
   }
 });
+
+// Delete project
+router.delete("/:id", protect, async (req, res) => {
+  try {
+    const subtitle = await Subtitle.findById(req.params.id);
+
+    if (!subtitle) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    if (subtitle.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    await Subtitle.findByIdAndDelete(req.params.id);
+
+    res.json({ message: "Project deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Delete failed" });
+  }
+});
 module.exports = router;

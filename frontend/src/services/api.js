@@ -51,6 +51,10 @@ export async function generateTranscript(id) {
   return res.data;
 }
 
+export async function deleteSubtitle(id) {
+  const res = await API.delete(`/subtitles/${id}`);
+  return res.data;
+}
 
 // Make this API variable available to other files
 export default API;

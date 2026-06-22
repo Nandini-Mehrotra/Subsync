@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";  // Add useRef
 import { useNavigate } from "react-router-dom";
-import { getSubtitles, uploadFile, generateTranscript } from "../services/api";
-
+import { getSubtitles, uploadFile, generateTranscript , deleteSubtitle} from "../services/api";
 // Format date nicely
 function formatDate(dateStr) {
   const d = new Date(dateStr);
@@ -177,6 +176,21 @@ export default function Dashboard() {
     showToast("Download failed", "error");
   }
 }
+
+async function handleDelete(id) {
+  const confirmDelete = window.confirm("Delete this project?");
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteSubtitle(id);
+    showToast("Project deleted", "success");
+    fetchProjects();
+  } catch (err) {
+    console.log(err.response?.data || err.message);
+    showToast("Delete failed", "error");
+  }
+}
   return (
     <div className="dashboard-layout">
 
@@ -295,7 +309,7 @@ export default function Dashboard() {
                 StatusBadge={StatusBadge}
                 navigate={navigate}
                 onDownload={handleDownload}
-
+                onDelete={handleDelete}
               />
             ))}
           </div>
@@ -310,7 +324,7 @@ export default function Dashboard() {
 }
 
 //Project Card
-function ProjectCard({ project, onGenerate, generatingId, StatusBadge, navigate, onDownload }) {
+function ProjectCard({ project, onGenerate, generatingId, StatusBadge, navigate, onDownload, onDelete }) {
   const isGenerating = generatingId === project._id;
   const isCompleted  = project.status === "completed";
   const isProcessing = project.status === "processing";
@@ -351,7 +365,7 @@ ${project.transcriptText || ""}
     .map((seg, index) => {
       return `${index + 1}
 ${formatTime(seg.start)} --> ${formatTime(seg.end)}
-${seg.text}
+${seg.hinglishText || seg.text}
 `;
     })
     .join("\n");
@@ -407,7 +421,7 @@ ${seg.text}
           <button
             className="btn-secondary"
             onClick={() =>
-              downloadTextFile("subtitle.txt", project.transcriptText || "")
+              downloadTextFile("subtitle.txt", project.hinglishText || project.transcriptText || "")
             }
           >
             TXT
@@ -420,6 +434,13 @@ ${seg.text}
             }
           >
             SRT
+          </button>
+
+          <button
+            className="btn-secondary"
+            onClick={() => onDelete(project._id)}
+          >
+            Delete
           </button>
         </div>
       )}

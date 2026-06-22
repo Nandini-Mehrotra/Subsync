@@ -14,7 +14,7 @@ const generateTranscript = async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    // Set status
+    // Mark processing
     subtitle.status = "processing";
     await subtitle.save();
 
@@ -36,14 +36,12 @@ const generateTranscript = async (req, res) => {
           });
         }
 
-        // Parse segments
-        const segments = JSON.parse(stdout);
+        // Parse Python output
+        const output = JSON.parse(stdout);
 
-        // Join text
-        const fullText = segments.map((seg) => seg.text).join(" ");
-
-        subtitle.transcriptText = fullText;
-        subtitle.segments = segments;
+        subtitle.transcriptText = output.transcriptText || "";
+        subtitle.hinglishText = output.hinglishText || "";
+        subtitle.segments = output.segments || [];
         subtitle.status = "completed";
 
         await subtitle.save();
