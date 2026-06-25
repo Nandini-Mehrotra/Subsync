@@ -30,6 +30,15 @@ const subtitleSchema = new mongoose.Schema(
       default: "",
     },
 
+    fileUrl: {
+      type: String,
+      default: "",
+    },
+
+    publicId: {
+      type: String,
+      default: "",
+    },
       segments: [
     {
       start: Number,

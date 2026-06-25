@@ -3,6 +3,8 @@ const multer = require("multer");
 const { protect } = require("../middleware/authMiddleware");
 const Subtitle = require("../models/Subtitle");
 const { generateTranscript } = require("../controllers/subtitleController");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 
 // Multer acts as a middleware or a bridge between the client-side form submission and your server making it easier to process any uploaded files
 // mainly for multipart/form-data
@@ -11,14 +13,11 @@ const { generateTranscript } = require("../controllers/subtitleController");
 
 const router = express.Router();
 
-// Store uploaded files in uploads folder
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "subsync",
+    resource_type: "auto",
   },
 });
 
@@ -29,8 +28,18 @@ router.post("/upload", protect, upload.single("file"), async (req, res) => {
   try {
     const subtitle = await Subtitle.create({
       user: req.user._id,
+
       originalFileName: req.file.originalname,
+
+      // Cloudinary URL
+      fileUrl: req.file.path,
+
+      // Cloudinary public ID
+      publicId: req.file.filename,
+
+      // Keep for backward compatibility
       filePath: req.file.path,
+
       status: "uploaded",
     });
 
@@ -39,6 +48,8 @@ router.post("/upload", protect, upload.single("file"), async (req, res) => {
       subtitle,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message: "File upload failed",
       error: error.message,

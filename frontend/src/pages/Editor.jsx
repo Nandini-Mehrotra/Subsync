@@ -73,7 +73,7 @@ function Editor() {
               <video
                 ref={mediaRef}
                 className="media-preview"
-                src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
+                src={project.fileUrl || `http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
                 controls
                 onTimeUpdate={handleTimeUpdate}
               />
@@ -88,7 +88,7 @@ function Editor() {
             <audio
               ref={mediaRef}
               className="media-preview"
-              src={`http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
+              src={project.fileUrl || `http://localhost:5000/${project.filePath.replaceAll("\\", "/")}`}
               controls
               onTimeUpdate={handleTimeUpdate}
             />

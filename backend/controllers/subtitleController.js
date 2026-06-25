@@ -1,6 +1,8 @@
 const { execFile } = require("child_process");
 const path = require("path");
 const Subtitle = require("../models/Subtitle");
+const fs = require("fs");
+const axios = require("axios");
 
 const generateTranscript = async (req, res) => {
   try {
@@ -19,7 +21,38 @@ const generateTranscript = async (req, res) => {
     await subtitle.save();
 
     const scriptPath = path.join(__dirname, "../transcribe.py");
-    const filePath = path.join(__dirname, "..", subtitle.filePath);
+
+    let filePath;
+
+    // If file is on Cloudinary, download it temporarily
+    if (subtitle.fileUrl || subtitle.filePath.startsWith("http")) {
+      const fileUrl = subtitle.fileUrl || subtitle.filePath;
+
+      const tempDir = path.join(__dirname, "../temp");
+
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
+      }
+
+      const safeFileName = `${subtitle._id}-${subtitle.originalFileName}`;
+      filePath = path.join(tempDir, safeFileName);
+
+      const response = await axios({
+        method: "GET",
+        url: fileUrl,
+        responseType: "stream",
+      });
+
+      const writer = fs.createWriteStream(filePath);
+      response.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on("finish", resolve);
+        writer.on("error", reject);
+      });
+    } else {
+      filePath = path.join(__dirname, "..", subtitle.filePath);
+    }
 
     execFile("python", [scriptPath, filePath], async (error, stdout, stderr) => {
       try {
